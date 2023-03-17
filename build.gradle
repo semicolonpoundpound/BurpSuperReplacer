@@ -1,0 +1,40 @@
+plugins {
+    id 'java'
+}
+
+group 'scpp.superreplacer'
+version '1.0.0'
+
+repositories {
+    mavenLocal()
+    mavenCentral()
+}
+
+dependencies {
+    compileOnly 'net.portswigger.burp.extensions:montoya-api:2023.3'
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.1'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.1'
+    implementation 'com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.14.2'
+//    implementation 'com.fasterxml.jackson.core:jackson-core:2.14.2'
+}
+
+
+
+test {
+    useJUnitPlatform()
+}
+
+//jar {}
+
+jar {
+    from {
+        duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+        configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
+    }
+//    exclude 'META-INF/services/com.fasterxml.jackson.databind.Module'
+//    exclude 'META-INF/LICENSE'
+//    exclude 'META-INF/NOTICE'
+//    exclude 'META-INF/LICENSE'
+//    exclude 'META-INF/LICENSE'
+//    exclude 'META-INF/LICENSE'
+}
