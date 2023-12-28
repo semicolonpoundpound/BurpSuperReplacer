@@ -23,7 +23,9 @@ public class UpdateResponseViewerRunnable implements Runnable {
         HttpRequest dynRequest = HttpRequest.httpRequest(dynService,
                 dynRequestAsStr);
 
-        HttpRequestResponse dynReqRes = this.api.http().sendRequest(dynRequest, HttpMode.HTTP_2);
+        dynRequest = dynRequest.withBody(dynRequest.bodyToString());
+
+        HttpRequestResponse dynReqRes = this.api.http().sendRequest(dynRequest, HttpMode.AUTO);
 
         String dynResponseAsStr = dynReqRes.response().toString();
 

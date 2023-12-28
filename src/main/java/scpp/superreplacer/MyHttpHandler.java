@@ -49,15 +49,16 @@ public class MyHttpHandler implements HttpHandler
     public RequestToBeSentAction handleHttpRequestToBeSent(HttpRequestToBeSent requestToBeSent)
     {
 
-            HttpRequest modifiedRequest = requestToBeSent;
-            Annotations annotations = requestToBeSent.annotations();
+        HttpRequest modifiedRequest = requestToBeSent;
+        Annotations annotations = requestToBeSent.annotations();
+
         try {
             String[] options = {"requests", "requests and responses"};
 
             Boolean enabled = this.tab.getEnabledValue();
             String intercept = this.tab.getInterceptValue().toLowerCase();
 
-            logging.logToOutput("tool: " + requestToBeSent.toolSource().toolType().toolName());
+            // logging.logToOutput("tool: " + requestToBeSent.toolSource().toolType().toolName());
 
             if (enabled && Arrays.asList(options).contains(intercept)) {
                 ArrayList<String> enabledTools = this.tab.getEnabledTools();
@@ -74,7 +75,7 @@ public class MyHttpHandler implements HttpHandler
 
                     if (!matchedValue.isEmpty()) {
 
-                        logging.logToOutput("Matched: " + matchedValue);
+                        // logging.logToOutput("Matched: " + matchedValue);
 
                         annotations = annotations.withNotes("Request was modified with Super Replacer");
 
@@ -100,11 +101,16 @@ public class MyHttpHandler implements HttpHandler
                                 HttpRequest dynRequest = HttpRequest.httpRequest(dynService,
                                         dynRequestAsStr);
 
-                                HttpRequestResponse dynReqRes = this.api.http().sendRequest(dynRequest, HttpMode.HTTP_2);
+                                dynRequest = dynRequest.withBody(dynRequest.bodyToString());
+
+                                HttpRequestResponse dynReqRes = this.api.http().sendRequest(dynRequest, HttpMode.AUTO);
 
                                 String dynResponseAsStr = dynReqRes.response().toString();
 
                                 replaceTargetString = dynResponseAsStr;
+
+                                // logging.logToOutput("dynamic response");
+                                // logging.logToOutput(dynResponseAsStr);
 
                             }
 
@@ -113,7 +119,7 @@ public class MyHttpHandler implements HttpHandler
                             replacerValue = this.tab.getReplaceWithValue();
                         }
 
-                        logging.logToOutput("Replacer: " + replacerValue);
+                        // logging.logToOutput("Replacer: " + replacerValue);
 
                         if (replacerValue != null) {
 
@@ -124,6 +130,10 @@ public class MyHttpHandler implements HttpHandler
 
                             logging.logToOutput("Replaced " + matchedValue + " with " + replacerValue);
 
+                            // logging.logToOutput("Creating new HTtpService");
+                            // logging.logToOutput("host: " + requestToBeSent.httpService().host());
+                            // logging.logToOutput("port: " + requestToBeSent.httpService().port());
+                            // logging.logToOutput("secure: " + requestToBeSent.httpService().secure());
                             // logging.logToOutput(requestAsStr);
 
                             //Modify the request by adding url param.
@@ -132,18 +142,22 @@ public class MyHttpHandler implements HttpHandler
                                     requestAsStr
                             );
 
+                            modifiedRequest = modifiedRequest.withBody(modifiedRequest.bodyToString());
+
+
+
                         } else {
-                            logging.logToOutput("Replacer does not have a value");
+                            // logging.logToOutput("Replacer does not have a value");
                         }
 
                     } else {
-                        logging.logToOutput("Matcher failed: " + matchRegex);
+                        // logging.logToOutput("Matcher failed: " + matchRegex);
                     }
                 } else {
-                    logging.logToOutput(toolSource + " is not enabled for this tab.");
+                    // logging.logToOutput(toolSource + " is not enabled for this tab.");
                 }
             } else {
-                logging.logToOutput("Tab is disabled or not set to intercept requests");
+                // logging.logToOutput("Tab is disabled or not set to intercept requests");
             }
             //Return the modified request to burp with updated annotations.
         }
@@ -155,7 +169,7 @@ public class MyHttpHandler implements HttpHandler
             logging.logToError(sw.toString());
         }
 
-        return continueWith(modifiedRequest, annotations);
+        return RequestToBeSentAction.continueWith(modifiedRequest, annotations);
     }
 
     @Override
@@ -170,7 +184,7 @@ public class MyHttpHandler implements HttpHandler
             Boolean enabled = this.tab.getEnabledValue();
             String intercept = this.tab.getInterceptValue().toLowerCase();
 
-            logging.logToOutput("tool: " + responseReceived.toolSource().toolType().toolName());
+            // logging.logToOutput("tool: " + responseReceived.toolSource().toolType().toolName());
 
             if (enabled && Arrays.asList(options).contains(intercept)) {
                 ArrayList<String> enabledTools = this.tab.getEnabledTools();
@@ -187,7 +201,7 @@ public class MyHttpHandler implements HttpHandler
 
                     if (!matchedValue.isEmpty()) {
 
-                        logging.logToOutput("Matched: " + matchedValue);
+                        // logging.logToOutput("Matched: " + matchedValue);
 
                         String replacerValue = null;
                         String replaceTargetString = bodyAsStr;
@@ -219,7 +233,7 @@ public class MyHttpHandler implements HttpHandler
                             replacerValue = this.tab.getReplaceWithValue();
                         }
 
-                        logging.logToOutput("Replacer: " + replacerValue);
+                        // logging.logToOutput("Replacer: " + replacerValue);
 
                         if (replacerValue != null) {
 
@@ -233,17 +247,17 @@ public class MyHttpHandler implements HttpHandler
                             annotations = annotations.withNotes("Response was modified with Super Replacer");
 
                         } else {
-                            logging.logToOutput("Replacer does not have a value");
+                            // logging.logToOutput("Replacer does not have a value");
                         }
 
                     } else {
-                        logging.logToOutput("Matcher failed: " + matchRegex);
+                        // logging.logToOutput("Matcher failed: " + matchRegex);
                     }
                 } else {
-                    logging.logToOutput(toolSource + " is not enabled for this tab.");
+                    // logging.logToOutput(toolSource + " is not enabled for this tab.");
                 }
             } else {
-                logging.logToOutput("Tab is disabled or not set to intercept responses");
+                // logging.logToOutput("Tab is disabled or not set to intercept responses");
             }
             //Return the modified request to burp with updated annotations.
         }
@@ -255,7 +269,7 @@ public class MyHttpHandler implements HttpHandler
             logging.logToError(sw.toString());
         }
 
-        return continueWith(responseReceived.withBody(bodyAsStr), annotations);
+        return ResponseReceivedAction.continueWith(responseReceived.withBody(bodyAsStr), annotations);
     }
 
     private String searchMessage(String needle, String haystack, Boolean isRegex)
@@ -278,15 +292,24 @@ public class MyHttpHandler implements HttpHandler
     private String replaceInMessage(String needle, String replacement, String haystack, Boolean isRegex,
                                     String replaceCount)
     {
-        String ret = "";
+        String ret = haystack;
 
-        Pattern matchPattern = Pattern.compile(needle, Pattern.MULTILINE);
-        Matcher matcher = matchPattern.matcher(haystack);
+        if(isRegex) {
+            Pattern matchPattern = Pattern.compile(needle, Pattern.MULTILINE);
+            Matcher matcher = matchPattern.matcher(haystack);
 
-        if (replaceCount.equalsIgnoreCase("first")) {
-            ret = matcher.replaceFirst(replacement);
-        } else if (replaceCount.equalsIgnoreCase("all")) {
-            ret = matcher.replaceAll(replacement);
+            if (replaceCount.equalsIgnoreCase("first")) {
+                ret = matcher.replaceFirst(replacement);
+            } else if (replaceCount.equalsIgnoreCase("all")) {
+                ret = matcher.replaceAll(replacement);
+            }
+        }
+        else {
+            if (replaceCount.equalsIgnoreCase("first")) {
+                ret = haystack.replace(needle, replacement);
+            } else if (replaceCount.equalsIgnoreCase("all")) {
+                ret = haystack.replaceAll(needle, replacement);
+            }
         }
 
         return ret;
