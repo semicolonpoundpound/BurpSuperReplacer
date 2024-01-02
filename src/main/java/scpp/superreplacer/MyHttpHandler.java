@@ -29,13 +29,13 @@ public class MyHttpHandler implements HttpHandler
 {
     private final MontoyaApi api;
     private final Logging logging;
-    private final ReplacerTab tab;
+    private final ArrayList<ReplacerTab> tabs;
 
-    public MyHttpHandler(MontoyaApi api, ReplacerTab mainTab)
+    public MyHttpHandler(MontoyaApi api, ArrayList<ReplacerTab> allTabs)
     {
         this.api = api;
         this.logging = api.logging();
-        this.tab = mainTab;
+        this.tabs = allTabs;
     }
 
 //    @Override
@@ -52,121 +52,130 @@ public class MyHttpHandler implements HttpHandler
         HttpRequest modifiedRequest = requestToBeSent;
         Annotations annotations = requestToBeSent.annotations();
 
-        try {
-            String[] options = {"requests", "requests and responses"};
+        boolean was_modified = false;
 
-            Boolean enabled = this.tab.getEnabledValue();
-            String intercept = this.tab.getInterceptValue().toLowerCase();
+        // for tab in this.tabs
+        for (ReplacerTab current_tab : this.tabs) {
 
-            // logging.logToOutput("tool: " + requestToBeSent.toolSource().toolType().toolName());
+            try {
+                String[] options = {"requests", "requests and responses"};
 
-            if (enabled && Arrays.asList(options).contains(intercept)) {
-                ArrayList<String> enabledTools = this.tab.getEnabledTools();
+                Boolean enabled = current_tab.getEnabledValue();
+                String intercept = current_tab.getInterceptValue().toLowerCase();
 
-                String toolSource = requestToBeSent.toolSource().toolType().toolName();
+                // logging.logToOutput("tool: " + requestToBeSent.toolSource().toolType().toolName());
 
-                if (enabledTools.contains(toolSource.toLowerCase())) {
-                    String matchRegex = this.tab.getMatchSearchValue();
-                    String requestAsStr = requestToBeSent.toString();
-                    Boolean matchisRegex = this.tab.getMatchSearchRegexValue();
+                if (enabled && Arrays.asList(options).contains(intercept)) {
+                    ArrayList<String> enabledTools = current_tab.getEnabledTools();
+
+                    String toolSource = requestToBeSent.toolSource().toolType().toolName();
+
+                    if (enabledTools.contains(toolSource.toLowerCase())) {
+                        String matchRegex = current_tab.getMatchSearchValue();
+                        String requestAsStr = requestToBeSent.toString();
+                        Boolean matchisRegex = current_tab.getMatchSearchRegexValue();
 
 
-                    String matchedValue = this.searchMessage(matchRegex, requestAsStr, matchisRegex);
+                        String matchedValue = this.searchMessage(matchRegex, requestAsStr, matchisRegex);
 
-                    if (!matchedValue.isEmpty()) {
+                        if (!matchedValue.isEmpty()) {
 
-                        // logging.logToOutput("Matched: " + matchedValue);
+                            // logging.logToOutput("Matched: " + matchedValue);
 
-                        annotations = annotations.withNotes("Request was modified with Super Replacer");
+                            String replacerValue = null;
+                            String replaceTargetString = requestAsStr;
 
-                        String replacerValue = null;
-                        String replaceTargetString = requestAsStr;
+                            Boolean replaceIsRegex = current_tab.getMatchReplaceRegexValue();
 
-                        Boolean replaceIsRegex = this.tab.getMatchReplaceRegexValue();
+                            if (replaceIsRegex) {
+                                String replaceRegex = current_tab.getReplaceWithValue();
 
-                        if (replaceIsRegex) {
-                            String replaceRegex = this.tab.getReplaceWithValue();
+                                if(current_tab.getSendRequestValue())
+                                {
+                                    String dynRequestAsStr = current_tab.getRequestViewerValue();
 
-                            if(this.tab.getSendRequestValue())
-                            {
-                                String dynRequestAsStr = this.tab.getRequestViewerValue();
+                                    HttpService dynService = Utils.createHttpService(current_tab.getConfig());
 
-                                HttpService dynService = Utils.createHttpService(this.tab.getConfig());
+                                    // logging.logToOutput("Creating new HTtpService");
+                                    // logging.logToOutput("host: " + dynService.host());
+                                    // logging.logToOutput("port: " + dynService.port());
+                                    // logging.logToOutput("secure: " + dynService.secure());
 
-                                // logging.logToOutput("Creating new HTtpService");
-                                // logging.logToOutput("host: " + dynService.host());
-                                // logging.logToOutput("port: " + dynService.port());
-                                // logging.logToOutput("secure: " + dynService.secure());
+                                    HttpRequest dynRequest = HttpRequest.httpRequest(dynService,
+                                            dynRequestAsStr);
 
-                                HttpRequest dynRequest = HttpRequest.httpRequest(dynService,
-                                        dynRequestAsStr);
+                                    dynRequest = dynRequest.withBody(dynRequest.bodyToString());
 
-                                dynRequest = dynRequest.withBody(dynRequest.bodyToString());
+                                    HttpRequestResponse dynReqRes = this.api.http().sendRequest(dynRequest, HttpMode.AUTO);
 
-                                HttpRequestResponse dynReqRes = this.api.http().sendRequest(dynRequest, HttpMode.AUTO);
+                                    String dynResponseAsStr = dynReqRes.response().toString();
 
-                                String dynResponseAsStr = dynReqRes.response().toString();
+                                    replaceTargetString = dynResponseAsStr;
 
-                                replaceTargetString = dynResponseAsStr;
+                                    // logging.logToOutput("dynamic response");
+                                    // logging.logToOutput(dynResponseAsStr);
 
-                                // logging.logToOutput("dynamic response");
-                                // logging.logToOutput(dynResponseAsStr);
+                                }
 
+                                replacerValue = this.searchMessage(replaceRegex, replaceTargetString, replaceIsRegex);
+                            } else {
+                                replacerValue = current_tab.getReplaceWithValue();
                             }
 
-                            replacerValue = this.searchMessage(replaceRegex, replaceTargetString, replaceIsRegex);
+                            // logging.logToOutput("Replacer: " + replacerValue);
+
+                            if (replacerValue != null) {
+
+                                String replaceCount = current_tab.getReplaceCountValue();
+
+                                requestAsStr = this.replaceInMessage(matchRegex, replacerValue, requestAsStr,
+                                        matchisRegex, replaceCount);
+
+                                logging.logToOutput("Replaced " + matchedValue + " with " + replacerValue);
+
+                                // logging.logToOutput("Creating new HTtpService");
+                                // logging.logToOutput("host: " + requestToBeSent.httpService().host());
+                                // logging.logToOutput("port: " + requestToBeSent.httpService().port());
+                                // logging.logToOutput("secure: " + requestToBeSent.httpService().secure());
+                                // logging.logToOutput(requestAsStr);
+
+                                //Modify the request by adding url param.
+                                modifiedRequest = HttpRequest.httpRequest(
+                                        requestToBeSent.httpService(),
+                                        requestAsStr
+                                );
+
+                                modifiedRequest = modifiedRequest.withBody(modifiedRequest.bodyToString());
+
+                                was_modified = true;
+
+                            } else {
+                                // logging.logToOutput("Replacer does not have a value");
+                            }
+
                         } else {
-                            replacerValue = this.tab.getReplaceWithValue();
+                            // logging.logToOutput("Matcher failed: " + matchRegex);
                         }
-
-                        // logging.logToOutput("Replacer: " + replacerValue);
-
-                        if (replacerValue != null) {
-
-                            String replaceCount = this.tab.getReplaceCountValue();
-
-                            requestAsStr = this.replaceInMessage(matchRegex, replacerValue, requestAsStr,
-                                    matchisRegex, replaceCount);
-
-                            logging.logToOutput("Replaced " + matchedValue + " with " + replacerValue);
-
-                            // logging.logToOutput("Creating new HTtpService");
-                            // logging.logToOutput("host: " + requestToBeSent.httpService().host());
-                            // logging.logToOutput("port: " + requestToBeSent.httpService().port());
-                            // logging.logToOutput("secure: " + requestToBeSent.httpService().secure());
-                            // logging.logToOutput(requestAsStr);
-
-                            //Modify the request by adding url param.
-                            modifiedRequest = HttpRequest.httpRequest(
-                                    requestToBeSent.httpService(),
-                                    requestAsStr
-                            );
-
-                            modifiedRequest = modifiedRequest.withBody(modifiedRequest.bodyToString());
-
-
-
-                        } else {
-                            // logging.logToOutput("Replacer does not have a value");
-                        }
-
                     } else {
-                        // logging.logToOutput("Matcher failed: " + matchRegex);
+                        // logging.logToOutput(toolSource + " is not enabled for this tab.");
                     }
                 } else {
-                    // logging.logToOutput(toolSource + " is not enabled for this tab.");
+                    // logging.logToOutput("Tab is disabled or not set to intercept requests");
                 }
-            } else {
-                // logging.logToOutput("Tab is disabled or not set to intercept requests");
+                //Return the modified request to burp with updated annotations.
             }
-            //Return the modified request to burp with updated annotations.
-        }
-        catch(Exception e)
-        {
-            StringWriter sw = new StringWriter();
-            PrintWriter pw = new PrintWriter(sw);
-            e.printStackTrace(pw);
-            logging.logToError(sw.toString());
+            catch(Exception e)
+            {
+                StringWriter sw = new StringWriter();
+                PrintWriter pw = new PrintWriter(sw);
+                e.printStackTrace(pw);
+                logging.logToError(sw.toString());
+            }
+
+        } // end for tab in this.tabs
+
+        if (was_modified) {
+            annotations = annotations.withNotes("Request was modified with Super Replacer");
         }
 
         return RequestToBeSentAction.continueWith(modifiedRequest, annotations);
@@ -178,95 +187,102 @@ public class MyHttpHandler implements HttpHandler
         Annotations annotations = responseReceived.annotations();
         String bodyAsStr = responseReceived.bodyToString();
 
-        try {
-            String[] options = {"responses", "requests and responses"};
+        boolean was_modified = false;
 
-            Boolean enabled = this.tab.getEnabledValue();
-            String intercept = this.tab.getInterceptValue().toLowerCase();
+        // for tab in this.tabs
+        for (ReplacerTab current_tab : this.tabs) {
 
-            // logging.logToOutput("tool: " + responseReceived.toolSource().toolType().toolName());
+            try {
+                String[] options = {"responses", "requests and responses"};
 
-            if (enabled && Arrays.asList(options).contains(intercept)) {
-                ArrayList<String> enabledTools = this.tab.getEnabledTools();
+                Boolean enabled = current_tab.getEnabledValue();
+                String intercept = current_tab.getInterceptValue().toLowerCase();
 
-                String toolSource = responseReceived.toolSource().toolType().toolName();
+                // logging.logToOutput("tool: " + responseReceived.toolSource().toolType().toolName());
 
-                if (enabledTools.contains(toolSource.toLowerCase())) {
-                    String matchRegex = this.tab.getMatchSearchValue();
+                if (enabled && Arrays.asList(options).contains(intercept)) {
+                    ArrayList<String> enabledTools = current_tab.getEnabledTools();
 
-                    Boolean matchIsRegex = this.tab.getMatchSearchRegexValue();
+                    String toolSource = responseReceived.toolSource().toolType().toolName();
+
+                    if (enabledTools.contains(toolSource.toLowerCase())) {
+                        String matchRegex = current_tab.getMatchSearchValue();
+
+                        Boolean matchIsRegex = current_tab.getMatchSearchRegexValue();
 
 
-                    String matchedValue = this.searchMessage(matchRegex, bodyAsStr, matchIsRegex);
+                        String matchedValue = this.searchMessage(matchRegex, bodyAsStr, matchIsRegex);
 
-                    if (!matchedValue.isEmpty()) {
+                        if (!matchedValue.isEmpty()) {
 
-                        // logging.logToOutput("Matched: " + matchedValue);
+                            // logging.logToOutput("Matched: " + matchedValue);
 
-                        String replacerValue = null;
-                        String replaceTargetString = bodyAsStr;
+                            String replacerValue = null;
+                            String replaceTargetString = bodyAsStr;
 
-                        Boolean replaceIsRegex = this.tab.getMatchReplaceRegexValue();
+                            Boolean replaceIsRegex = current_tab.getMatchReplaceRegexValue();
 
-                        if (replaceIsRegex) {
-                            String replaceRegex = this.tab.getReplaceWithValue();
+                            if (replaceIsRegex) {
+                                String replaceRegex = current_tab.getReplaceWithValue();
 
-                            if(this.tab.getSendRequestValue())
-                            {
-                                String dynRequestAsStr = this.tab.getRequestViewerValue();
+                                if (current_tab.getSendRequestValue()) {
+                                    String dynRequestAsStr = current_tab.getRequestViewerValue();
 
-                                HttpService dynService = Utils.createHttpService(this.tab.getConfig());
+                                    HttpService dynService = Utils.createHttpService(current_tab.getConfig());
 
-                                HttpRequest dynRequest = HttpRequest.httpRequest(dynService,
-                                        dynRequestAsStr);
+                                    HttpRequest dynRequest = HttpRequest.httpRequest(dynService,
+                                            dynRequestAsStr);
 
-                                HttpRequestResponse dynReqRes = this.api.http().sendRequest(dynRequest, HttpMode.HTTP_2);
+                                    HttpRequestResponse dynReqRes = this.api.http().sendRequest(dynRequest, HttpMode.HTTP_2);
 
-                                String dynResponseAsStr = dynReqRes.response().toString();
+                                    String dynResponseAsStr = dynReqRes.response().toString();
 
-                                replaceTargetString = dynResponseAsStr;
+                                    replaceTargetString = dynResponseAsStr;
 
+                                }
+
+                                replacerValue = this.searchMessage(replaceRegex, replaceTargetString, replaceIsRegex);
+                            } else {
+                                replacerValue = current_tab.getReplaceWithValue();
                             }
 
-                            replacerValue = this.searchMessage(replaceRegex, replaceTargetString, replaceIsRegex);
+                            // logging.logToOutput("Replacer: " + replacerValue);
+
+                            if (replacerValue != null) {
+
+                                String replaceCount = current_tab.getReplaceCountValue();
+
+                                bodyAsStr = this.replaceInMessage(matchRegex, replacerValue, bodyAsStr,
+                                        matchIsRegex, replaceCount);
+
+                                logging.logToOutput("Replaced " + matchedValue + " with " + replacerValue);
+
+                                annotations = annotations.withNotes("Response was modified with Super Replacer");
+
+                            } else {
+                                // logging.logToOutput("Replacer does not have a value");
+                            }
+
                         } else {
-                            replacerValue = this.tab.getReplaceWithValue();
+                            // logging.logToOutput("Matcher failed: " + matchRegex);
                         }
-
-                        // logging.logToOutput("Replacer: " + replacerValue);
-
-                        if (replacerValue != null) {
-
-                            String replaceCount = this.tab.getReplaceCountValue();
-
-                            bodyAsStr = this.replaceInMessage(matchRegex, replacerValue, bodyAsStr,
-                                    matchIsRegex, replaceCount);
-
-                            logging.logToOutput("Replaced " + matchedValue + " with " + replacerValue);
-
-                            annotations = annotations.withNotes("Response was modified with Super Replacer");
-
-                        } else {
-                            // logging.logToOutput("Replacer does not have a value");
-                        }
-
                     } else {
-                        // logging.logToOutput("Matcher failed: " + matchRegex);
+                        // logging.logToOutput(toolSource + " is not enabled for this tab.");
                     }
                 } else {
-                    // logging.logToOutput(toolSource + " is not enabled for this tab.");
+                    // logging.logToOutput("Tab is disabled or not set to intercept responses");
                 }
-            } else {
-                // logging.logToOutput("Tab is disabled or not set to intercept responses");
+                //Return the modified request to burp with updated annotations.
+            } catch (Exception e) {
+                StringWriter sw = new StringWriter();
+                PrintWriter pw = new PrintWriter(sw);
+                e.printStackTrace(pw);
+                logging.logToError(sw.toString());
             }
-            //Return the modified request to burp with updated annotations.
         }
-        catch(Exception e)
-        {
-            StringWriter sw = new StringWriter();
-            PrintWriter pw = new PrintWriter(sw);
-            e.printStackTrace(pw);
-            logging.logToError(sw.toString());
+
+        if (was_modified) {
+            annotations = annotations.withNotes("Request was modified with Super Replacer");
         }
 
         return ResponseReceivedAction.continueWith(responseReceived.withBody(bodyAsStr), annotations);
