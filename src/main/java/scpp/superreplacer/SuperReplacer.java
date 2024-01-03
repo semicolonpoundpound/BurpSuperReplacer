@@ -42,13 +42,15 @@ public class SuperReplacer implements BurpExtension {
 
         // will need to create a new main tab that will have the tabbed top with a button for new tab
         // the rest of the window will contain replacer tabs
-        ReplacerTab mainTab = new ReplacerTab(this.api);
+        ReplacerTab firstTab = new ReplacerTab(this.api);
 
-        tabs.add(mainTab);
+        tabs.add(firstTab);
 
-        ContextMenuItemsProvider contextProvider = new MyContextMenuItemsProvider(this.api, mainTab);
+        MainWindow mainWindow = new MainWindow(this.api, tabs);
 
-        this.api.userInterface().registerSuiteTab(EXTENSION_NAME, mainTab.getTabUI());
+        ContextMenuItemsProvider contextProvider = new MyContextMenuItemsProvider(this.api, firstTab);
+
+        this.api.userInterface().registerSuiteTab(EXTENSION_NAME, mainWindow.getTabUI());
         this.api.http().registerHttpHandler(new MyHttpHandler(this.api, tabs));
         this.api.userInterface().registerContextMenuItemsProvider(contextProvider);
     }
