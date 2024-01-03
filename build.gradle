@@ -31,7 +31,7 @@ jar {
         duplicatesStrategy = DuplicatesStrategy.EXCLUDE
         configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
     }
-    archiveName 'BurpSuperReplacer'
+    archiveName 'BurpSuperReplacer.jar'
 //    exclude 'META-INF/services/com.fasterxml.jackson.databind.Module'
 //    exclude 'META-INF/LICENSE'
 //    exclude 'META-INF/NOTICE'
