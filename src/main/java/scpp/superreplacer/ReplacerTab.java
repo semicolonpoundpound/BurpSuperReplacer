@@ -32,6 +32,8 @@ public class ReplacerTab {
 
     private MontoyaApi api;
 
+    private String name;
+
     private final String EXTENSION_NAME = "Super Replacer";
     private final String MATCH_PANE_TITLE = "Parameters";
     private final String MATCH_PANE_LABEL = "Search & Replace";
@@ -76,6 +78,8 @@ public class ReplacerTab {
     public ReplacerTab(MontoyaApi api)
     {
         this.api = api;
+
+        this.name = "First Tab";
 
         UserInterface userInterface = api.userInterface();
 
@@ -134,6 +138,8 @@ public class ReplacerTab {
 
         return enabledTools;
     }
+
+    public String getName() { return this.name; }
 
     public Boolean getEnabledValue(){
         return chkEnabled.isSelected();
@@ -198,6 +204,9 @@ public class ReplacerTab {
     public Boolean getToolSequencerValue(){
         return chkToolSequencer.isSelected();
     }
+
+
+    public void setName(String newName) { this.name = newName; }
 
     public void setEnabledValue(Boolean val){
         chkEnabled.setSelected(val);

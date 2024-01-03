@@ -66,6 +66,9 @@ public class MyHttpHandler implements HttpHandler
                 // logging.logToOutput("tool: " + requestToBeSent.toolSource().toolType().toolName());
 
                 if (enabled && Arrays.asList(options).contains(intercept)) {
+
+                    // logging.logToOutput("Entering tab: " + current_tab.getName());
+
                     ArrayList<String> enabledTools = current_tab.getEnabledTools();
 
                     String toolSource = requestToBeSent.toolSource().toolType().toolName();
