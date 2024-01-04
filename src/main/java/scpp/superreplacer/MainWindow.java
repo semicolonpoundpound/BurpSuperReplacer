@@ -30,26 +30,31 @@ public class MainWindow {
         for(int i = 0; i < this.tabs.size(); i++) {
             String title = Integer.toString(i+1);
             tabPanel.addTab(title, this.tabs.get(i).getTabUI());
-            JPanel pnlTab = new JPanel(new FlowLayout(FlowLayout.CENTER, 2, 2));
-            pnlTab.setOpaque(false);
-            JLabel lblTitle = new JLabel(title);
-            JButton btnClose = new JButton("x");
-            btnClose.setBorder(null);
-            btnClose.setBorder(BorderFactory.createEmptyBorder(4, 4, 4, 4));
-            btnClose.setContentAreaFilled(false);
-//            btnClose.setBorderPainted(false);
-//            btnClose.setMargin(new Insets(2,2,2,2));
-
-
-            pnlTab.add(lblTitle);
-            pnlTab.add(btnClose);
-
-            tabPanel.setTabComponentAt(i, pnlTab);
+            this.createCloseButton(this, tabPanel, i);
         }
 
         this.createAddButton(this, tabPanel);
 
         return tabPanel;
+    }
+
+    private void createCloseButton(MainWindow main, JTabbedPane tabPanel, int i) {
+        String title = Integer.toString(i+1);
+        JPanel pnlTab = new JPanel(new FlowLayout(FlowLayout.CENTER, 2, 2));
+        pnlTab.setOpaque(false);
+        JLabel lblTitle = new JLabel(title);
+        JButton btnClose = new JButton("x");
+        btnClose.setBorder(null);
+        btnClose.setBorder(BorderFactory.createEmptyBorder(4, 4, 4, 4));
+        btnClose.setContentAreaFilled(false);
+//            btnClose.setBorderPainted(false);
+//            btnClose.setMargin(new Insets(2,2,2,2));
+
+
+        pnlTab.add(lblTitle);
+        pnlTab.add(btnClose);
+
+        tabPanel.setTabComponentAt(i, pnlTab);
     }
 
     private void createAddButton(MainWindow main, JTabbedPane tabPanel) {
