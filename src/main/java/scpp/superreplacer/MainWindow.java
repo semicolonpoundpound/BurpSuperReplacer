@@ -78,7 +78,10 @@ public class MainWindow {
                 ReplacerTab newTab = new ReplacerTab(main.api);
                 main.tabs.add(newTab);
                 String title = String.valueOf(main.tabs.size());
-                tabPanel.insertTab(title, null, newTab.getTabUI(), null,tabPanel.getTabCount () - 1);
+                tabPanel.insertTab(title, null, newTab.getTabUI(), null, tabPanel.getTabCount()-1);
+                logging.logToOutput("getTabCount-1: " + String.valueOf(tabPanel.getTabCount()-1));
+                logging.logToOutput("tabs.size: " + String.valueOf(main.tabs.size()));
+                main.createCloseButton(main, tabPanel, main.tabs.size()-1);
             }
         };
 
