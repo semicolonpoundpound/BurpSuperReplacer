@@ -43,13 +43,26 @@ public class MainWindow {
         JPanel pnlTab = new JPanel(new FlowLayout(FlowLayout.CENTER, 2, 2));
         pnlTab.setOpaque(false);
         JLabel lblTitle = new JLabel(title);
+        lblTitle.setBorder(BorderFactory.createEmptyBorder(2, 4, 2, 4));
         JButton btnClose = new JButton("x");
         btnClose.setBorder(null);
-        btnClose.setBorder(BorderFactory.createEmptyBorder(4, 4, 4, 4));
+        btnClose.setBorder(BorderFactory.createEmptyBorder(2, 2, 2, 2));
         btnClose.setContentAreaFilled(false);
 //            btnClose.setBorderPainted(false);
 //            btnClose.setMargin(new Insets(2,2,2,2));
 
+        ActionListener listener = e -> {
+            // logging.logToOutput("remove i: " + String.valueOf(i));
+            if (i >= 0) {
+                main.tabs.remove(i);
+                tabPanel.removeTabAt(i);
+                for(int j = i; j < main.tabs.size(); j++) {
+                    this.createCloseButton(main, tabPanel, j);
+                }
+            }
+        };
+
+        btnClose.addActionListener(listener);
 
         pnlTab.add(lblTitle);
         pnlTab.add(btnClose);
@@ -72,17 +85,14 @@ public class MainWindow {
         addTab.setFocusable (false);
         pnlTab.add (addTab);
 
-        ActionListener listener = new ActionListener () {
-            @Override
-            public void actionPerformed (ActionEvent e) {
-                ReplacerTab newTab = new ReplacerTab(main.api);
-                main.tabs.add(newTab);
-                String title = String.valueOf(main.tabs.size());
-                tabPanel.insertTab(title, null, newTab.getTabUI(), null, tabPanel.getTabCount()-1);
-                logging.logToOutput("getTabCount-1: " + String.valueOf(tabPanel.getTabCount()-1));
-                logging.logToOutput("tabs.size: " + String.valueOf(main.tabs.size()));
-                main.createCloseButton(main, tabPanel, main.tabs.size()-1);
-            }
+        ActionListener listener = e -> {
+            ReplacerTab newTab = new ReplacerTab(main.api);
+            main.tabs.add(newTab);
+            String title = String.valueOf(main.tabs.size());
+            tabPanel.insertTab(title, null, newTab.getTabUI(), null, tabPanel.getTabCount()-1);
+            // logging.logToOutput("getTabCount-1: " + String.valueOf(tabPanel.getTabCount()-1));
+            // logging.logToOutput("tabs.size: " + String.valueOf(main.tabs.size()));
+            main.createCloseButton(main, tabPanel, main.tabs.size()-1);
         };
 
         addTab.addActionListener (listener);
