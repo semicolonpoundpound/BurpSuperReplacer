@@ -6,6 +6,7 @@ import java.io.FileWriter;
 import java.io.StringWriter;
 import java.io.PrintWriter;
 import java.io.IOException;
+import java.util.ArrayList;
 
 import burp.api.montoya.MontoyaApi;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -16,10 +17,10 @@ import burp.api.montoya.logging.Logging;
 public class ExportActionListener implements ActionListener {
 
     private MontoyaApi api;
-    private ReplacerTab mainTab;
-    public ExportActionListener(MontoyaApi api, ReplacerTab mainTab) {
+    private ArrayList<ReplacerTab> tabs;
+    public ExportActionListener(MontoyaApi api, ArrayList<ReplacerTab> tabs) {
 
-        this.mainTab = mainTab;
+        this.tabs = tabs;
         this.api = api;
     }
 
@@ -29,27 +30,27 @@ public class ExportActionListener implements ActionListener {
 
     private Boolean saveConfiguration()
     {
-        final JFileChooser fc = new JFileChooser();
-        if (fc.showSaveDialog(null) == JFileChooser.APPROVE_OPTION)
-        { // write file
-            Logging logging = this.api.logging();
-            StringWriter sw = new StringWriter();
-            PrintWriter pw = new PrintWriter(sw);
-            TabConfig cfg = new TabConfig(this.mainTab);
-            try {
-                String json = cfg.toJSON();
-                try (FileWriter fw = new FileWriter(fc.getSelectedFile())) {
-                    fw.write(json);
-                } catch (IOException ioe) {
-                    ioe.printStackTrace(pw);
-                    logging.logToError(sw.toString());
-                }
-            }
-            catch(JsonProcessingException e) {
-                e.printStackTrace(pw);
-                logging.logToError(sw.toString());
-            }
-        }
+//        final JFileChooser fc = new JFileChooser();
+//        if (fc.showSaveDialog(null) == JFileChooser.APPROVE_OPTION)
+//        { // write file
+//            Logging logging = this.api.logging();
+//            StringWriter sw = new StringWriter();
+//            PrintWriter pw = new PrintWriter(sw);
+//            TabConfig cfg = new TabConfig(this.mainTab);
+//            try {
+//                String json = cfg.toJSON();
+//                try (FileWriter fw = new FileWriter(fc.getSelectedFile())) {
+//                    fw.write(json);
+//                } catch (IOException ioe) {
+//                    ioe.printStackTrace(pw);
+//                    logging.logToError(sw.toString());
+//                }
+//            }
+//            catch(JsonProcessingException e) {
+//                e.printStackTrace(pw);
+//                logging.logToError(sw.toString());
+//            }
+//        }
 
         return true;
     }

@@ -6,6 +6,7 @@ import java.nio.file.Files;
 import java.io.StringWriter;
 import java.io.PrintWriter;
 import java.io.IOException;
+import java.util.ArrayList;
 
 import burp.api.montoya.MontoyaApi;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -16,10 +17,10 @@ import burp.api.montoya.logging.Logging;
 public class ImportActionListener implements ActionListener {
 
     private MontoyaApi api;
-    private ReplacerTab mainTab;
-    public ImportActionListener(MontoyaApi api, ReplacerTab mainTab) {
+    private ArrayList<ReplacerTab> tabs;
+    public ImportActionListener(MontoyaApi api, ArrayList<ReplacerTab> tabs) {
 
-        this.mainTab = mainTab;
+        this.tabs = tabs;
         this.api = api;
     }
 
@@ -39,7 +40,7 @@ public class ImportActionListener implements ActionListener {
             try {
                 String json_str = new String(Files.readAllBytes(fc.getSelectedFile().toPath()));
                 TabConfig cfg = mapper.readValue(json_str, TabConfig.class);
-                this.mainTab.loadConfig(cfg);
+//                this.mainTab.loadConfig(cfg);
             }catch (Exception ioe) {
                 ioe.printStackTrace(pw);
                 logging.logToError(sw.toString());

@@ -457,22 +457,22 @@ public class ReplacerTab {
         toolPanel.add(chkToolSequencer, tpc);
 
         // add btnImportCfg
-        btnImportCfg.addActionListener(new ImportActionListener(this.api, this));
-        tpc.fill = GridBagConstraints.HORIZONTAL;
-        tpc.gridwidth = 3;
-        tpc.gridx = 0;
-        tpc.gridy += 1;
-        tpc.insets = new Insets(0, 0, 10, 0);
-        toolPanel.add(btnImportCfg, tpc);
+        // btnImportCfg.addActionListener(new ImportActionListener(this.api, this));
+        // tpc.fill = GridBagConstraints.HORIZONTAL;
+        // tpc.gridwidth = 3;
+        // tpc.gridx = 0;
+        // tpc.gridy += 1;
+        // tpc.insets = new Insets(0, 0, 10, 0);
+        // toolPanel.add(btnImportCfg, tpc);
 
         // add btnExportCfg
-        btnExportCfg.addActionListener(new ExportActionListener(this.api, this));
-        tpc.fill = GridBagConstraints.HORIZONTAL;
-        tpc.gridwidth = 3;
-        tpc.gridx = 0;
-        tpc.gridy += 1;
-        tpc.insets = new Insets(0, 0, 10, 0);
-        toolPanel.add(btnExportCfg, tpc);
+        // btnExportCfg.addActionListener(new ExportActionListener(this.api, this));
+        // tpc.fill = GridBagConstraints.HORIZONTAL;
+        // tpc.gridwidth = 3;
+        // tpc.gridx = 0;
+        // tpc.gridy += 1;
+        // tpc.insets = new Insets(0, 0, 10, 0);
+        // toolPanel.add(btnExportCfg, tpc);
 
         return toolPanel;
     }

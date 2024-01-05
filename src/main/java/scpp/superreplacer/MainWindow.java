@@ -15,6 +15,10 @@ public class MainWindow {
     private final Logging logging;
     private ArrayList<ReplacerTab> tabs;
 
+    private final int PRETABS = 1; // num of tabs before first replacer
+    private final int POSTTABS = 1; //num of tabs after last replacer
+    private final String HELP_TAB_TITLE = "Settings";
+
     public MainWindow(MontoyaApi api, ArrayList<ReplacerTab> allTabs) {
         this.api = api;
         this.logging = api.logging();
@@ -26,6 +30,9 @@ public class MainWindow {
         MainWindow that = this;
 
         JTabbedPane tabPanel = new JTabbedPane();
+
+        HelpTab helpTab = new HelpTab(this.api, this.tabs);
+        tabPanel.addTab(HELP_TAB_TITLE, helpTab.getTabUI());
 
         for(int i = 0; i < this.tabs.size(); i++) {
             String title = Integer.toString(i+1);
@@ -55,7 +62,7 @@ public class MainWindow {
             // logging.logToOutput("remove i: " + String.valueOf(i));
             if (i >= 0) {
                 main.tabs.remove(i);
-                tabPanel.removeTabAt(i);
+                tabPanel.removeTabAt(i+PRETABS);
                 for(int j = i; j < main.tabs.size(); j++) {
                     this.createCloseButton(main, tabPanel, j);
                 }
@@ -67,7 +74,7 @@ public class MainWindow {
         pnlTab.add(lblTitle);
         pnlTab.add(btnClose);
 
-        tabPanel.setTabComponentAt(i, pnlTab);
+        tabPanel.setTabComponentAt(i+1, pnlTab);
     }
 
     private void createAddButton(MainWindow main, JTabbedPane tabPanel) {
@@ -92,7 +99,7 @@ public class MainWindow {
             tabPanel.insertTab(title, null, newTab.getTabUI(), null, tabPanel.getTabCount()-1);
             // logging.logToOutput("getTabCount-1: " + String.valueOf(tabPanel.getTabCount()-1));
             // logging.logToOutput("tabs.size: " + String.valueOf(main.tabs.size()));
-            main.createCloseButton(main, tabPanel, main.tabs.size()-1);
+            main.createCloseButton(main, tabPanel, main.tabs.size()-POSTTABS);
         };
 
         addTab.addActionListener (listener);
