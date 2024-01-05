@@ -77,22 +77,39 @@ public class HelpTab {
         tpc.insets = new Insets(0,10,20,10);
         toolPanel.add(chkEnabled, tpc);
 
+        // add label for cboIntercept
+        JLabel lblInterceptLabel = new JLabel("Verbosity:");
+        // tpc.fill = GridBagConstraints.HORIZONTAL;
+        tpc.weightx = 0.0;
+        tpc.gridwidth = 1;
+        tpc.gridx = 0;
+        tpc.gridy += 1;
+        tpc.insets = new Insets(0,10,30,10);
+        toolPanel.add(lblInterceptLabel, tpc);
+
+        // add cboIntercept to panel
+        tpc.weightx = 0.0;
+        tpc.gridx += 1;
+        tpc.insets = new Insets(0,0,30,10);
+        toolPanel.add(cboVerbosity, tpc);
+
         // add btnImportCfg
         btnImportCfg.addActionListener(new ImportActionListener(this.api, this.tabs));
         tpc.fill = GridBagConstraints.HORIZONTAL;
-        tpc.gridwidth = 3;
+        tpc.weightx = 1.0;
+        tpc.gridwidth = 2;
         tpc.gridx = 0;
         tpc.gridy += 1;
-        tpc.insets = new Insets(0, 0, 10, 0);
+        tpc.insets = new Insets(0, 10, 10, 10);
         toolPanel.add(btnImportCfg, tpc);
 
         // add btnExportCfg
         btnExportCfg.addActionListener(new ExportActionListener(this.api, this.tabs));
         tpc.fill = GridBagConstraints.HORIZONTAL;
-        tpc.gridwidth = 3;
+        tpc.gridwidth = 2;
         tpc.gridx = 0;
         tpc.gridy += 1;
-        tpc.insets = new Insets(0, 0, 10, 0);
+        tpc.insets = new Insets(0, 10, 10, 10);
         toolPanel.add(btnExportCfg, tpc);
 
         return toolPanel;
@@ -121,7 +138,7 @@ public class HelpTab {
         // TOOL PANE
         JPanel settingsPanel = this.getSettingsPaneUI();
         tpc.anchor = GridBagConstraints.NORTHWEST;
-        tpc.fill = GridBagConstraints.NONE;
+        tpc.fill = GridBagConstraints.HORIZONTAL;
         tpc.weightx = .4;
         tpc.gridx = 1;
         tpc.gridy = 0;
