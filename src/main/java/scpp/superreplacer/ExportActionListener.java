@@ -18,39 +18,46 @@ public class ExportActionListener implements ActionListener {
 
     private MontoyaApi api;
     private ArrayList<ReplacerTab> tabs;
-    public ExportActionListener(MontoyaApi api, ArrayList<ReplacerTab> tabs) {
+    private MainConfig config;
+    Logging logging;
+    public ExportActionListener(MontoyaApi api, MainWindow main) {
 
-        this.tabs = tabs;
+        this.tabs = main.getReplacerTabs();
         this.api = api;
+//        this.config = cfg;
+        this.logging = api.logging();
+
+        logging.logToOutput("eal:"+String.valueOf(main.getReplacerTabs().size()));
     }
 
     public void actionPerformed(ActionEvent e) {
+        logging.logToOutput("eal performed:"+String.valueOf(this.tabs.size()));
         this.saveConfiguration();
     }
 
     private Boolean saveConfiguration()
     {
-//        final JFileChooser fc = new JFileChooser();
-//        if (fc.showSaveDialog(null) == JFileChooser.APPROVE_OPTION)
-//        { // write file
-//            Logging logging = this.api.logging();
-//            StringWriter sw = new StringWriter();
-//            PrintWriter pw = new PrintWriter(sw);
-//            TabConfig cfg = new TabConfig(this.mainTab);
-//            try {
-//                String json = cfg.toJSON();
-//                try (FileWriter fw = new FileWriter(fc.getSelectedFile())) {
-//                    fw.write(json);
-//                } catch (IOException ioe) {
-//                    ioe.printStackTrace(pw);
-//                    logging.logToError(sw.toString());
-//                }
-//            }
-//            catch(JsonProcessingException e) {
-//                e.printStackTrace(pw);
-//                logging.logToError(sw.toString());
-//            }
-//        }
+        final JFileChooser fc = new JFileChooser();
+        if (fc.showSaveDialog(null) == JFileChooser.APPROVE_OPTION)
+        { // write file
+            Logging logging = this.api.logging();
+            StringWriter sw = new StringWriter();
+            PrintWriter pw = new PrintWriter(sw);
+
+            try {
+                String json = this.config.toJSON();
+                try (FileWriter fw = new FileWriter(fc.getSelectedFile())) {
+                    fw.write(json);
+                } catch (IOException ioe) {
+                    ioe.printStackTrace(pw);
+                    logging.logToError(sw.toString());
+                }
+            }
+            catch(JsonProcessingException e) {
+                e.printStackTrace(pw);
+                logging.logToError(sw.toString());
+            }
+        }
 
         return true;
     }

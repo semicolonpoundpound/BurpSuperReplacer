@@ -75,11 +75,11 @@ public class ReplacerTab {
     private JButton btnExportCfg = new JButton("Export Config");
 
 
-    public ReplacerTab(MontoyaApi api)
+    public ReplacerTab(MontoyaApi api, String name)
     {
         this.api = api;
 
-        this.name = "First Tab";
+        this.name = name;
 
         UserInterface userInterface = api.userInterface();
 
@@ -94,7 +94,7 @@ public class ReplacerTab {
 
     public void loadConfig(TabConfig cfg)
     {
-        this.setEnabledValue(cfg.getEnabled());
+        // this.setEnabledValue(cfg.getEnabled());
         this.setInterceptValue(cfg.getIntercept());
         this.setMatchSearchRegexValue(cfg.getMatchSearchRegex());
         this.setMatchSearchValue(cfg.getMatchSearch());
@@ -141,9 +141,9 @@ public class ReplacerTab {
 
     public String getName() { return this.name; }
 
-    public Boolean getEnabledValue(){
-        return chkEnabled.isSelected();
-    }
+    // public Boolean getEnabledValue(){
+       // return chkEnabled.isSelected();
+    // }
     public String getInterceptValue(){
         return cboIntercept.getSelectedItem().toString();
     }
@@ -208,9 +208,9 @@ public class ReplacerTab {
 
     public void setName(String newName) { this.name = newName; }
 
-    public void setEnabledValue(Boolean val){
-        chkEnabled.setSelected(val);
-    }
+    // public void setEnabledValue(Boolean val){
+        // chkEnabled.setSelected(val);
+    // }
     public void setInterceptValue(String val){
         cboIntercept.setSelectedItem(val);
     }
@@ -281,20 +281,20 @@ public class ReplacerTab {
         GridBagConstraints tpc = new GridBagConstraints();
 
         // add chkEnabled
-        tpc.fill = GridBagConstraints.HORIZONTAL;
-        tpc.weightx = 1.0;
-        tpc.gridwidth = 2;
-        tpc.gridx = 0;
-        tpc.gridy = 0;
-        tpc.insets = new Insets(0,10,20,10);
-        matchPanel.add(chkEnabled, tpc);
+        // tpc.fill = GridBagConstraints.HORIZONTAL;
+        // tpc.weightx = 1.0;
+        // tpc.gridwidth = 2;
+        // tpc.gridx = 0;
+        // tpc.gridy = 0;
+        // tpc.insets = new Insets(0,10,20,10);
+        // matchPanel.add(chkEnabled, tpc);
 
         // add label for cboIntercept
         JLabel lblInterceptLabel = new JLabel("Intercept:");
         tpc.fill = GridBagConstraints.HORIZONTAL;
         tpc.weightx = 0.0;
         tpc.gridx = 0;
-        tpc.gridy += 1;
+        tpc.gridy = 0;
         tpc.insets = new Insets(0,10,30,10);
         matchPanel.add(lblInterceptLabel, tpc);
 

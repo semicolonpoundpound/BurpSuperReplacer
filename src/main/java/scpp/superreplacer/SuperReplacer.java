@@ -42,7 +42,7 @@ public class SuperReplacer implements BurpExtension {
 
         // will need to create a new main tab that will have the tabbed top with a button for new tab
         // the rest of the window will contain replacer tabs
-        ReplacerTab firstTab = new ReplacerTab(this.api);
+        ReplacerTab firstTab = new ReplacerTab(this.api, Integer.toString(tabs.size() + 1));
 
         tabs.add(firstTab);
 

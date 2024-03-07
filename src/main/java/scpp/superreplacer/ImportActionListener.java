@@ -18,10 +18,14 @@ public class ImportActionListener implements ActionListener {
 
     private MontoyaApi api;
     private ArrayList<ReplacerTab> tabs;
-    public ImportActionListener(MontoyaApi api, ArrayList<ReplacerTab> tabs) {
 
-        this.tabs = tabs;
+    private final MainConfig config;
+
+    public ImportActionListener(MontoyaApi api, MainConfig cfg) {
+
+        // this.tabs = helpTab.getReplacerTabs();
         this.api = api;
+        this.config = cfg;
     }
 
     public void actionPerformed(ActionEvent e) {

@@ -1,6 +1,7 @@
 package scpp.superreplacer;
 
 import burp.api.montoya.MontoyaApi;
+import burp.api.montoya.logging.Logging;
 import burp.api.montoya.ui.UserInterface;
 import burp.api.montoya.ui.editor.HttpRequestEditor;
 import burp.api.montoya.ui.editor.HttpResponseEditor;
@@ -20,6 +21,7 @@ import static burp.api.montoya.ui.editor.EditorOptions.READ_ONLY;
 public class HelpTab {
     private MontoyaApi api;
     private ArrayList<ReplacerTab> tabs;
+    private final Logging logging;
 
     private final String TITLE_PANE_TITLE = "Super Replacer";
     private final String SETTINGS_PANE_TITLE = "Settings";
@@ -35,9 +37,15 @@ public class HelpTab {
     public HelpTab(MontoyaApi api, ArrayList<ReplacerTab> tabs)
     {
         this.api = api;
-
+        this.logging = api.logging();
         this.tabs = tabs;
+
+        logging.logToOutput("ht init: " + String.valueOf(tabs.size()));
     }
+
+    public Boolean getEnabled() { return this.chkEnabled.isSelected(); }
+    public String getVerbosity() { return this.cboVerbosity.getSelectedItem().toString(); }
+    public ArrayList<ReplacerTab> getReplacerTabs() { return this.tabs; }
 
     private JPanel getTitlePaneUI()
     {
@@ -94,7 +102,7 @@ public class HelpTab {
         toolPanel.add(cboVerbosity, tpc);
 
         // add btnImportCfg
-        btnImportCfg.addActionListener(new ImportActionListener(this.api, this.tabs));
+        // btnImportCfg.addActionListener(new ImportActionListener(this.api, new MainConfig(this)));
         tpc.fill = GridBagConstraints.HORIZONTAL;
         tpc.weightx = 1.0;
         tpc.gridwidth = 2;
@@ -104,7 +112,7 @@ public class HelpTab {
         toolPanel.add(btnImportCfg, tpc);
 
         // add btnExportCfg
-        btnExportCfg.addActionListener(new ExportActionListener(this.api, this.tabs));
+        // btnExportCfg.addActionListener(new ExportActionListener(this.api, new MainConfig(this)));
         tpc.fill = GridBagConstraints.HORIZONTAL;
         tpc.gridwidth = 2;
         tpc.gridx = 0;

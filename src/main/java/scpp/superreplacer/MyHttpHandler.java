@@ -54,13 +54,17 @@ public class MyHttpHandler implements HttpHandler
 
         boolean was_modified = false;
 
+        logging.logToOutput("handleReq: " + String.valueOf(this.tabs.size()));
+
+        String requestAsStr = requestToBeSent.toString();
+
         // for tab in this.tabs
         for (ReplacerTab current_tab : this.tabs) {
 
             try {
                 String[] options = {"requests", "requests and responses"};
 
-                Boolean enabled = current_tab.getEnabledValue();
+                Boolean enabled = true; // current_tab.getEnabledValue();
                 String intercept = current_tab.getInterceptValue().toLowerCase();
 
                 // logging.logToOutput("tool: " + requestToBeSent.toolSource().toolType().toolName());
@@ -75,7 +79,7 @@ public class MyHttpHandler implements HttpHandler
 
                     if (enabledTools.contains(toolSource.toLowerCase())) {
                         String matchRegex = current_tab.getMatchSearchValue();
-                        String requestAsStr = requestToBeSent.toString();
+//                        String requestAsStr = requestToBeSent.toString();
                         Boolean matchisRegex = current_tab.getMatchSearchRegexValue();
 
 
@@ -191,14 +195,14 @@ public class MyHttpHandler implements HttpHandler
         String bodyAsStr = responseReceived.bodyToString();
 
         boolean was_modified = false;
-
+        int count = 0;
         // for tab in this.tabs
         for (ReplacerTab current_tab : this.tabs) {
-
+            logging.logToOutput("tab: " + String.valueOf(count));
             try {
                 String[] options = {"responses", "requests and responses"};
 
-                Boolean enabled = current_tab.getEnabledValue();
+                Boolean enabled = true; // current_tab.getEnabledValue();
                 String intercept = current_tab.getInterceptValue().toLowerCase();
 
                 // logging.logToOutput("tool: " + responseReceived.toolSource().toolType().toolName());

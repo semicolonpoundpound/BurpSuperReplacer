@@ -32,7 +32,7 @@ public class TabConfig {
 
     public TabConfig(ReplacerTab tab)
     {
-        this.enabled = tab.getEnabledValue();
+        // this.enabled = tab.getEnabledValue();
         this.intercept = tab.getInterceptValue();
         this.matchSearchRegex = tab.getMatchSearchRegexValue();
         this.matchSearch = tab.getMatchSearchValue();
@@ -61,7 +61,7 @@ public class TabConfig {
         return json;
     }
 
-    public Boolean getEnabled() { return this.enabled; }
+    // public Boolean getEnabled() { return this.enabled; }
     public String getIntercept() { return this.intercept; }
     public Boolean getMatchSearchRegex() { return this.matchSearchRegex; }
     public String getMatchSearch() { return this.matchSearch; }
@@ -82,7 +82,7 @@ public class TabConfig {
     public Boolean getToolScanner() { return this.toolScanner; };
     public Boolean getToolSequencer() { return this.toolSequencer; };
 
-    public void setEnabled(Boolean val) { this.enabled = val; }
+    // public void setEnabled(Boolean val) { this.enabled = val; }
     public void setIntercept(String val) { this.intercept = val; }
     public void setMatchSearchRegex(Boolean val) { this.matchSearchRegex = val; }
     public void setMatchSearch(String val) { this.matchSearch = val; }
