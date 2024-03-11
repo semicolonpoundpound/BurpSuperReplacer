@@ -14,16 +14,17 @@ public class MainConfig {
     private Boolean enabled;
     private ArrayList<TabConfig> tabConfigs = new ArrayList<TabConfig>();
 
-    private final MontoyaApi api;
-    private final Logging logging;
+    // private final MontoyaApi api;
+    // private final Logging logging;
 
-    public MainConfig(MontoyaApi api, MainWindow main) {
+    public MainConfig() {}
+    public MainConfig(MainWindow main) {
         this.verbosity = main.getVerbosity();
         this.enabled = main.getEnabled();
-        this.api = api;
-        this.logging = api.logging();
+        // this.api = api;
+        // this.logging = api.logging();
 
-        logging.logToOutput("mc: " + String.valueOf(main.getReplacerTabs().size()));
+        // logging.logToOutput("mc: " + String.valueOf(main.getReplacerTabs().size()));
         for(ReplacerTab curTab : main.getReplacerTabs()) {
             this.tabConfigs.add(new TabConfig(curTab));
         }

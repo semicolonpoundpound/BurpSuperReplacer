@@ -19,19 +19,21 @@ public class ExportActionListener implements ActionListener {
     private MontoyaApi api;
     private ArrayList<ReplacerTab> tabs;
     private MainConfig config;
+    private MainWindow window;
     Logging logging;
     public ExportActionListener(MontoyaApi api, MainWindow main) {
 
+        this.window = main;
         this.tabs = main.getReplacerTabs();
         this.api = api;
-//        this.config = cfg;
+        this.config = new MainConfig(main);
         this.logging = api.logging();
 
-        logging.logToOutput("eal:"+String.valueOf(main.getReplacerTabs().size()));
+        // logging.logToOutput("export tab count:"+String.valueOf(main.getReplacerTabs().size()));
     }
 
     public void actionPerformed(ActionEvent e) {
-        logging.logToOutput("eal performed:"+String.valueOf(this.tabs.size()));
+        // logging.logToOutput("eal performed:"+String.valueOf(this.tabs.size()));
         this.saveConfiguration();
     }
 
@@ -45,7 +47,8 @@ public class ExportActionListener implements ActionListener {
             PrintWriter pw = new PrintWriter(sw);
 
             try {
-                String json = this.config.toJSON();
+                String json = new MainConfig(this.window).toJSON();
+                // logging.logToOutput("export json:\n"+json);
                 try (FileWriter fw = new FileWriter(fc.getSelectedFile())) {
                     fw.write(json);
                 } catch (IOException ioe) {

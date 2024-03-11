@@ -2,6 +2,7 @@ package scpp.superreplacer;
 
 import burp.api.montoya.MontoyaApi;
 import burp.api.montoya.logging.Logging;
+import com.sun.tools.javac.Main;
 
 import javax.swing.*;
 import java.awt.*;
@@ -14,6 +15,7 @@ public class MainWindow {
     private final MontoyaApi api;
     private final Logging logging;
     private ArrayList<ReplacerTab> tabs;
+    private JTabbedPane tabPanel;
 
     private final int PRETABS = 1; // num of tabs before first replacer
     private final int POSTTABS = 1; //num of tabs after last replacer
@@ -33,6 +35,7 @@ public class MainWindow {
     public MainWindow(MontoyaApi api, ArrayList<ReplacerTab> allTabs) {
         this.api = api;
         this.logging = api.logging();
+        this.tabPanel = new JTabbedPane();
         this.tabs = allTabs;
         logging.logToOutput("mw init: " + String.valueOf(allTabs.size()));
     }
@@ -41,23 +44,58 @@ public class MainWindow {
     public String getVerbosity() { return this.cboVerbosity.getSelectedItem().toString(); }
     public ArrayList<ReplacerTab> getReplacerTabs() { return this.tabs; }
 
-    public Component getTabUI()
-    {
-        MainWindow that = this;
+    public void updateFromConfig(MainConfig cfg) {
 
-        JTabbedPane tabPanel = new JTabbedPane();
+        this.tabs.clear();
+        this.tabPanel.removeAll();
 
-        tabPanel.addTab(HELP_TAB_TITLE, this.getHelpTabUI());
+        for(TabConfig curCfg : cfg.getTabConfigs()) {
+            ReplacerTab newTab = new ReplacerTab(this.api, Integer.toString(this.tabs.size() + 1));
+            newTab.loadConfig(curCfg);
+            this.tabs.add(newTab);
+        }
+
+        this.createTabs();
+
+        this.cboVerbosity.setSelectedItem(cfg.getVerbosity());
+        this.chkEnabled.setSelected(cfg.getEnabled());
+    }
+
+    public static MainWindow fromConfig(MontoyaApi api, MainConfig cfg) {
+
+        ArrayList<ReplacerTab> newTabs = new ArrayList<>();
+
+        for(TabConfig curCfg : cfg.getTabConfigs()) {
+            ReplacerTab newTab = new ReplacerTab(api, Integer.toString(newTabs.size() + 1));
+            newTab.loadConfig(curCfg);
+            newTabs.add(newTab);
+        }
+
+        MainWindow newWin = new MainWindow(api, newTabs);
+
+        newWin.cboVerbosity.setSelectedItem(cfg.getVerbosity());
+        newWin.chkEnabled.setSelected(cfg.getEnabled());
+
+        return newWin;
+    }
+
+    public Component getTabUI() {
+
+        this.createTabs();
+
+        return this.tabPanel;
+    }
+
+    private void createTabs() {
+        this.tabPanel.addTab(HELP_TAB_TITLE, this.getHelpTabUI());
 
         for(int i = 0; i < this.tabs.size(); i++) {
             String title = Integer.toString(i+1);
-            tabPanel.addTab(title, this.tabs.get(i).getTabUI());
-            this.createCloseButton(this, tabPanel, i);
+            this.tabPanel.addTab(title, this.tabs.get(i).getTabUI());
+            this.createCloseButton(this, this.tabPanel, i);
         }
 
-        this.createAddButton(this, tabPanel);
-
-        return tabPanel;
+        this.createAddButton(this, this.tabPanel);
     }
 
     private void createCloseButton(MainWindow main, JTabbedPane tabPanel, int i) {
@@ -178,7 +216,7 @@ public class MainWindow {
         toolPanel.add(cboVerbosity, tpc);
 
         // add btnImportCfg
-        btnImportCfg.addActionListener(new ImportActionListener(this.api, new MainConfig(this.api, this)));
+        btnImportCfg.addActionListener(new ImportActionListener(this.api, this));
         tpc.fill = GridBagConstraints.HORIZONTAL;
         tpc.weightx = 1.0;
         tpc.gridwidth = 2;

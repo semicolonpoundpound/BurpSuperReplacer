@@ -19,13 +19,13 @@ public class ImportActionListener implements ActionListener {
     private MontoyaApi api;
     private ArrayList<ReplacerTab> tabs;
 
-    private final MainConfig config;
+    private MainWindow main;
 
-    public ImportActionListener(MontoyaApi api, MainConfig cfg) {
+    public ImportActionListener(MontoyaApi api, MainWindow main) {
 
         // this.tabs = helpTab.getReplacerTabs();
         this.api = api;
-        this.config = cfg;
+        this.main = main;
     }
 
     public void actionPerformed(ActionEvent e) {
@@ -43,9 +43,11 @@ public class ImportActionListener implements ActionListener {
             ObjectMapper mapper = new ObjectMapper();
             try {
                 String json_str = new String(Files.readAllBytes(fc.getSelectedFile().toPath()));
-                TabConfig cfg = mapper.readValue(json_str, TabConfig.class);
-//                this.mainTab.loadConfig(cfg);
-            }catch (Exception ioe) {
+                MainConfig cfg = mapper.readValue(json_str, MainConfig.class);
+
+                // this.main = MainWindow.fromConfig(this.api, cfg);
+                this.main.updateFromConfig(cfg);
+            } catch (Exception ioe) {
                 ioe.printStackTrace(pw);
                 logging.logToError(sw.toString());
             }
