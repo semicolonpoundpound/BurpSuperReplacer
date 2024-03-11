@@ -51,7 +51,7 @@ public class SuperReplacer implements BurpExtension {
         ContextMenuItemsProvider contextProvider = new MyContextMenuItemsProvider(this.api, firstTab);
 
         this.api.userInterface().registerSuiteTab(EXTENSION_NAME, mainWindow.getTabUI());
-        this.api.http().registerHttpHandler(new MyHttpHandler(this.api, tabs));
+        this.api.http().registerHttpHandler(new MyHttpHandler(this.api, mainWindow));
         this.api.userInterface().registerContextMenuItemsProvider(contextProvider);
     }
 }

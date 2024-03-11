@@ -37,7 +37,7 @@ public class MainWindow {
         this.logging = api.logging();
         this.tabPanel = new JTabbedPane();
         this.tabs = allTabs;
-        logging.logToOutput("mw init: " + String.valueOf(allTabs.size()));
+        // logging.logToOutput("mw init: " + String.valueOf(allTabs.size()));
     }
 
     public Boolean getEnabled() { return this.chkEnabled.isSelected(); }
