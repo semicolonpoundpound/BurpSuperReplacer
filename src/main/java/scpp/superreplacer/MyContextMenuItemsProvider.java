@@ -11,26 +11,31 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class MyContextMenuItemsProvider implements ContextMenuItemsProvider {
-    MontoyaApi api;
-    ReplacerTab tab;
-    public MyContextMenuItemsProvider(MontoyaApi api, ReplacerTab tab)
+    private MontoyaApi api;
+    private MainWindow main;
+    public MyContextMenuItemsProvider(MontoyaApi api, MainWindow main)
     {
         this.api = api;
-        this.tab = tab;
+        this.main = main;
     }
     @Override
     public List<Component> provideMenuItems(ContextMenuEvent event) {
 
-        JMenuItem jitem = new JMenuItem("Use as Dynamic Request");
-
-        MenuItemActionListener sendToSuperReplacerListener = new MenuItemActionListener(this.api, this.tab,
-                event);
-
-        jitem.addActionListener(sendToSuperReplacerListener);
-
         List<Component> items = new ArrayList<Component>();
 
-        items.add(jitem);
+        int count = 0;
+        // for tab in this.tabs
+        for (ReplacerTab current_tab : this.main.getReplacerTabs()) {
+
+            JMenuItem jitem = new JMenuItem("Tab" + String.valueOf(++count) + ": Use as Dynamic Request");
+
+            MenuItemActionListener sendToSuperReplacerListener = new MenuItemActionListener(this.api, current_tab,
+                    event);
+
+            jitem.addActionListener(sendToSuperReplacerListener);
+
+            items.add(jitem);
+        }
 
         return items;
     }
