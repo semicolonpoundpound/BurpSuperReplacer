@@ -29,8 +29,8 @@ public class MainWindow {
     private JCheckBox chkEnabled= new JCheckBox("Enabled");
     private String verbosityItems[] = {"None", "Info", "Debug"};;
     private JComboBox<String> cboVerbosity = new JComboBox<String>(verbosityItems);
-    private JButton btnImportCfg = new JButton("Import Config");
-    private JButton btnExportCfg = new JButton("Export Config");
+    private JButton btnImportCfg;
+    private JButton btnExportCfg;
 
     public MainWindow(MontoyaApi api, ArrayList<ReplacerTab> allTabs) {
         this.api = api;
@@ -46,16 +46,42 @@ public class MainWindow {
 
     public void updateFromConfig(MainConfig cfg) {
 
+        // logging.logToOutput("tab count pre clear: " + String.valueOf(this.tabs.size()));
         this.tabs.clear();
+        // logging.logToOutput("tab count post clear: " + String.valueOf(this.tabs.size()));
+
+        // logging.logToOutput("tabp count pre removeat: " + String.valueOf(this.tabPanel.getTabCount()));
         this.tabPanel.removeAll();
+        // for(int i = 1; i < this.tabPanel.getTabCount(); i++) {
+            // logging.logToOutput("removing tab: " + String.valueOf(i) + " of " +this.tabPanel.getTabCount());
+            // this.tabPanel.removeTabAt(i);
+        // }
+
+        // logging.logToOutput("tabp count post removeat: " + String.valueOf(this.tabPanel.getTabCount()));
 
         for(TabConfig curCfg : cfg.getTabConfigs()) {
-            ReplacerTab newTab = new ReplacerTab(this.api, Integer.toString(this.tabs.size() + 1));
+            String title = Integer.toString(this.tabs.size() + 1);
+            ReplacerTab newTab = new ReplacerTab(this.api, title);
             newTab.loadConfig(curCfg);
             this.tabs.add(newTab);
         }
+        // logging.logToOutput("tab count post add: " + String.valueOf(this.tabs.size()));
+
+        this.tabPanel.addTab(HELP_TAB_TITLE, this.getHelpTabUI());
+
+        // logging.logToOutput("tabp count pre add: " + String.valueOf(this.tabPanel.getTabCount()));
 
         this.createTabs();
+
+        // logging.logToOutput("tab count: " + String.valueOf(this.tabs.size()));
+
+        // logging.logToOutput("tabp count: " + String.valueOf(this.tabPanel.getTabCount()));
+
+        this.createAddButton(this, this.tabPanel);
+
+        // logging.logToOutput("tab count: " + String.valueOf(this.tabs.size()));
+
+        // logging.logToOutput("tabp count: " + String.valueOf(this.tabPanel.getTabCount()));
 
         this.cboVerbosity.setSelectedItem(cfg.getVerbosity());
         this.chkEnabled.setSelected(cfg.getEnabled());
@@ -80,22 +106,22 @@ public class MainWindow {
     }
 
     public Component getTabUI() {
+        this.tabPanel.addTab(HELP_TAB_TITLE, this.getHelpTabUI());
 
         this.createTabs();
+
+        this.createAddButton(this, this.tabPanel);
 
         return this.tabPanel;
     }
 
     private void createTabs() {
-        this.tabPanel.addTab(HELP_TAB_TITLE, this.getHelpTabUI());
 
         for(int i = 0; i < this.tabs.size(); i++) {
             String title = Integer.toString(i+1);
             this.tabPanel.addTab(title, this.tabs.get(i).getTabUI());
             this.createCloseButton(this, this.tabPanel, i);
         }
-
-        this.createAddButton(this, this.tabPanel);
     }
 
     private void createCloseButton(MainWindow main, JTabbedPane tabPanel, int i) {
@@ -216,6 +242,7 @@ public class MainWindow {
         toolPanel.add(cboVerbosity, tpc);
 
         // add btnImportCfg
+        btnImportCfg = new JButton("Import Config");
         btnImportCfg.addActionListener(new ImportActionListener(this.api, this));
         tpc.fill = GridBagConstraints.HORIZONTAL;
         tpc.weightx = 1.0;
@@ -226,6 +253,7 @@ public class MainWindow {
         toolPanel.add(btnImportCfg, tpc);
 
         // add btnExportCfg
+        JButton btnExportCfg = new JButton("Export Config");
         btnExportCfg.addActionListener(new ExportActionListener(this.api, this));
         tpc.fill = GridBagConstraints.HORIZONTAL;
         tpc.gridwidth = 2;
