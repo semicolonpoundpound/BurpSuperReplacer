@@ -6,6 +6,7 @@ import java.io.FileWriter;
 import java.io.StringWriter;
 import java.io.PrintWriter;
 import java.io.IOException;
+import java.util.ArrayList;
 
 import burp.api.montoya.MontoyaApi;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -16,14 +17,23 @@ import burp.api.montoya.logging.Logging;
 public class ExportActionListener implements ActionListener {
 
     private MontoyaApi api;
-    private ReplacerTab mainTab;
-    public ExportActionListener(MontoyaApi api, ReplacerTab mainTab) {
+    private ArrayList<ReplacerTab> tabs;
+    private MainConfig config;
+    private MainWindow window;
+    Logging logging;
+    public ExportActionListener(MontoyaApi api, MainWindow main) {
 
-        this.mainTab = mainTab;
+        this.window = main;
+        this.tabs = main.getReplacerTabs();
         this.api = api;
+        this.config = new MainConfig(main);
+        this.logging = api.logging();
+
+        // logging.logToOutput("export tab count:"+String.valueOf(main.getReplacerTabs().size()));
     }
 
     public void actionPerformed(ActionEvent e) {
+        // logging.logToOutput("eal performed:"+String.valueOf(this.tabs.size()));
         this.saveConfiguration();
     }
 
@@ -35,9 +45,10 @@ public class ExportActionListener implements ActionListener {
             Logging logging = this.api.logging();
             StringWriter sw = new StringWriter();
             PrintWriter pw = new PrintWriter(sw);
-            TabConfig cfg = new TabConfig(this.mainTab);
+
             try {
-                String json = cfg.toJSON();
+                String json = new MainConfig(this.window).toJSON();
+                // logging.logToOutput("export json:\n"+json);
                 try (FileWriter fw = new FileWriter(fc.getSelectedFile())) {
                     fw.write(json);
                 } catch (IOException ioe) {

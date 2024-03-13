@@ -32,6 +32,8 @@ public class ReplacerTab {
 
     private MontoyaApi api;
 
+    private String name;
+
     private final String EXTENSION_NAME = "Super Replacer";
     private final String MATCH_PANE_TITLE = "Parameters";
     private final String MATCH_PANE_LABEL = "Search & Replace";
@@ -73,9 +75,11 @@ public class ReplacerTab {
     private JButton btnExportCfg = new JButton("Export Config");
 
 
-    public ReplacerTab(MontoyaApi api)
+    public ReplacerTab(MontoyaApi api, String name)
     {
         this.api = api;
+
+        this.name = name;
 
         UserInterface userInterface = api.userInterface();
 
@@ -90,7 +94,7 @@ public class ReplacerTab {
 
     public void loadConfig(TabConfig cfg)
     {
-        this.setEnabledValue(cfg.getEnabled());
+        //this.setEnabledValue(cfg.getEnabled());
         this.setInterceptValue(cfg.getIntercept());
         this.setMatchSearchRegexValue(cfg.getMatchSearchRegex());
         this.setMatchSearchValue(cfg.getMatchSearch());
@@ -135,9 +139,11 @@ public class ReplacerTab {
         return enabledTools;
     }
 
-    public Boolean getEnabledValue(){
-        return chkEnabled.isSelected();
-    }
+    public String getName() { return this.name; }
+
+    //public Boolean getEnabledValue(){
+        //return chkEnabled.isSelected();
+    //}
     public String getInterceptValue(){
         return cboIntercept.getSelectedItem().toString();
     }
@@ -199,9 +205,12 @@ public class ReplacerTab {
         return chkToolSequencer.isSelected();
     }
 
-    public void setEnabledValue(Boolean val){
-        chkEnabled.setSelected(val);
-    }
+
+    public void setName(String newName) { this.name = newName; }
+
+    //public void setEnabledValue(Boolean val){
+        //chkEnabled.setSelected(val);
+    //}
     public void setInterceptValue(String val){
         cboIntercept.setSelectedItem(val);
     }
@@ -271,21 +280,12 @@ public class ReplacerTab {
 
         GridBagConstraints tpc = new GridBagConstraints();
 
-        // add chkEnabled
-        tpc.fill = GridBagConstraints.HORIZONTAL;
-        tpc.weightx = 1.0;
-        tpc.gridwidth = 2;
-        tpc.gridx = 0;
-        tpc.gridy = 0;
-        tpc.insets = new Insets(0,10,20,10);
-        matchPanel.add(chkEnabled, tpc);
-
         // add label for cboIntercept
         JLabel lblInterceptLabel = new JLabel("Intercept:");
         tpc.fill = GridBagConstraints.HORIZONTAL;
         tpc.weightx = 0.0;
         tpc.gridx = 0;
-        tpc.gridy += 1;
+        tpc.gridy = 0;
         tpc.insets = new Insets(0,10,30,10);
         matchPanel.add(lblInterceptLabel, tpc);
 
@@ -388,6 +388,15 @@ public class ReplacerTab {
         toolPanel.setLayout(new GridBagLayout());
         toolPanel.setBorder(BorderFactory.createTitledBorder(TOOL_PANE_TITLE));
 
+        // add chkEnabled
+        //tpc.fill = GridBagConstraints.HORIZONTAL;
+        //tpc.weightx = 1.0;
+        //tpc.gridwidth = 3;
+        //tpc.gridx = 0;
+        //tpc.gridy = 0;
+        //tpc.insets = new Insets(0,0,10,0);
+        //toolPanel.add(chkEnabled, tpc);
+
         JLabel lblToolLabel = new JLabel(TOOL_PANE_LABEL);
         tpc.fill = GridBagConstraints.HORIZONTAL;
         tpc.weightx = 0.0;
@@ -448,22 +457,22 @@ public class ReplacerTab {
         toolPanel.add(chkToolSequencer, tpc);
 
         // add btnImportCfg
-        btnImportCfg.addActionListener(new ImportActionListener(this.api, this));
-        tpc.fill = GridBagConstraints.HORIZONTAL;
-        tpc.gridwidth = 3;
-        tpc.gridx = 0;
-        tpc.gridy += 1;
-        tpc.insets = new Insets(0, 0, 10, 0);
-        toolPanel.add(btnImportCfg, tpc);
+        // btnImportCfg.addActionListener(new ImportActionListener(this.api, this));
+        // tpc.fill = GridBagConstraints.HORIZONTAL;
+        // tpc.gridwidth = 3;
+        // tpc.gridx = 0;
+        // tpc.gridy += 1;
+        // tpc.insets = new Insets(0, 0, 10, 0);
+        // toolPanel.add(btnImportCfg, tpc);
 
         // add btnExportCfg
-        btnExportCfg.addActionListener(new ExportActionListener(this.api, this));
-        tpc.fill = GridBagConstraints.HORIZONTAL;
-        tpc.gridwidth = 3;
-        tpc.gridx = 0;
-        tpc.gridy += 1;
-        tpc.insets = new Insets(0, 0, 10, 0);
-        toolPanel.add(btnExportCfg, tpc);
+        // btnExportCfg.addActionListener(new ExportActionListener(this.api, this));
+        // tpc.fill = GridBagConstraints.HORIZONTAL;
+        // tpc.gridwidth = 3;
+        // tpc.gridx = 0;
+        // tpc.gridy += 1;
+        // tpc.insets = new Insets(0, 0, 10, 0);
+        // toolPanel.add(btnExportCfg, tpc);
 
         return toolPanel;
     }

@@ -30,18 +30,28 @@ public class SuperReplacer implements BurpExtension {
 
     private final String REQ_PANE_TITLE = "Dynamic Request";
     private final String REQ_PANE_LABEL = "Dynamic Value";
+
     @Override
     public void initialize(MontoyaApi api)
     {
         this.api = api;
         api.extension().setName(EXTENSION_NAME);
 
-        ReplacerTab mainTab = new ReplacerTab(this.api);
+        // list of tabs
+        ArrayList<ReplacerTab> tabs = new ArrayList<>();
 
-        ContextMenuItemsProvider contextProvider = new MyContextMenuItemsProvider(this.api, mainTab);
+        // will need to create a new main tab that will have the tabbed top with a button for new tab
+        // the rest of the window will contain replacer tabs
+        ReplacerTab firstTab = new ReplacerTab(this.api, Integer.toString(tabs.size() + 1));
 
-        this.api.userInterface().registerSuiteTab(EXTENSION_NAME, mainTab.getTabUI());
-        this.api.http().registerHttpHandler(new MyHttpHandler(this.api, mainTab));
+        tabs.add(firstTab);
+
+        MainWindow mainWindow = new MainWindow(this.api, tabs);
+
+        ContextMenuItemsProvider contextProvider = new MyContextMenuItemsProvider(this.api, mainWindow);
+
+        this.api.userInterface().registerSuiteTab(EXTENSION_NAME, mainWindow.getTabUI());
+        this.api.http().registerHttpHandler(new MyHttpHandler(this.api, mainWindow));
         this.api.userInterface().registerContextMenuItemsProvider(contextProvider);
     }
 }
